@@ -1,4 +1,4 @@
-from graph import get_neighbors, get_conversion_cost
+from game.graph import get_neighbors, get_conversion_cost
 
 
 def validate_route(route):

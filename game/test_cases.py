@@ -1,4 +1,4 @@
-from game_logic import (
+from game.game_logic import (
     validate_route,
     calculate_route_cost,
     evaluate_player_route
