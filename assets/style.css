@@ -1,1 +1,258 @@
-/* empty file */
+/* Currency Quest - interface styling (loaded by app.py) */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap");
+
+:root {
+    --bg: #0B1222;
+    --panel: #121C33;
+    --panel-border: #22304F;
+    --text: #E8ECF4;
+    --muted: #8A93A6;
+    --gold: #E9B949;
+    --gold-soft: rgba(233, 185, 73, 0.14);
+    --green: #3DD68C;
+    --red: #F2766B;
+}
+
+html, body, [class*="css"], .stApp {
+    font-family: "Inter", sans-serif;
+}
+
+.stApp {
+    background:
+        radial-gradient(circle at 15% 0%, rgba(233, 185, 73, 0.08), transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(61, 214, 140, 0.06), transparent 35%),
+        var(--bg);
+    color: var(--text);
+}
+
+[data-testid="stHeader"] {
+    background: transparent;
+}
+
+.block-container {
+    padding-top: 2rem;
+    max-width: 1200px;
+}
+
+/* ---------- Header ---------- */
+
+.hero {
+    padding: 1.6rem 1.8rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--panel), rgba(18, 28, 51, 0.6));
+}
+
+.hero h1 {
+    margin: 0.4rem 0 0.3rem;
+    padding: 0;
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.hero p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.05rem;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: var(--gold-soft);
+    color: var(--gold);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ---------- Section titles ---------- */
+
+.step {
+    margin: 1.2rem 0 0.6rem;
+    color: var(--gold);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.panel-title {
+    margin: 1rem 0 0.5rem;
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* ---------- Route chips ---------- */
+
+.route {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.4rem 0 1rem;
+}
+
+.chip {
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--panel);
+    color: var(--text);
+    font-weight: 600;
+}
+
+.chip-current {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: #111;
+}
+
+.arrow {
+    color: var(--muted);
+}
+
+/* ---------- Buttons ---------- */
+
+.stButton > button {
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--panel);
+    color: var(--text);
+    font-weight: 600;
+    transition: border-color 0.15s, transform 0.15s;
+}
+
+.stButton > button:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateY(-1px);
+}
+
+.stButton > button[kind="primary"] {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: #111;
+}
+
+.stButton > button[kind="primary"]:hover {
+    color: #111;
+    filter: brightness(1.08);
+}
+
+/* ---------- Metrics ---------- */
+
+[data-testid="stMetric"] {
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    background: var(--panel);
+}
+
+[data-testid="stMetricLabel"] {
+    color: var(--muted);
+}
+
+.stButton > button:disabled,
+.stButton > button:disabled:hover {
+    opacity: 0.4;
+    transform: none;
+    border-color: var(--panel-border);
+    color: var(--muted);
+}
+
+.stButton > button[kind="primary"]:disabled {
+    background: var(--panel);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+/* ---------- Keep text readable in both light and dark system themes ---------- */
+
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stWidgetLabel"] p,
+[data-testid="stCaptionContainer"],
+[data-testid="stMetricValue"] {
+    color: var(--text);
+}
+
+[data-testid="stCaptionContainer"],
+[data-testid="stWidgetLabel"] p {
+    color: var(--muted);
+}
+
+[data-testid="stSelectbox"] div:has(> input) {
+    border-color: var(--panel-border);
+    background: var(--panel);
+}
+
+[data-testid="stSelectbox"] input,
+[data-testid="stSelectbox"] div:has(> input) * {
+    color: var(--text);
+}
+
+[data-testid="stSelectbox"] svg {
+    fill: var(--muted);
+}
+
+[data-testid="stAlertContainer"] {
+    border: 1px solid var(--panel-border);
+    background: var(--panel);
+}
+
+[data-testid="stAlertContainer"] code {
+    background: var(--gold-soft);
+    color: var(--gold);
+}
+
+/* ---------- Comparison table ---------- */
+
+.results-table {
+    width: 100%;
+    margin: 0.4rem 0 1rem;
+    border-collapse: collapse;
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 0.92rem;
+}
+
+.results-table th {
+    padding: 0.6rem 0.8rem;
+    background: var(--panel);
+    color: var(--gold);
+    font-weight: 600;
+    text-align: left;
+}
+
+.results-table td {
+    padding: 0.55rem 0.8rem;
+    border-top: 1px solid var(--panel-border);
+}
+
+/* ---------- Result verdict ---------- */
+
+.verdict {
+    margin: 0.4rem 0 0.8rem;
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.verdict-win {
+    border: 1px solid var(--green);
+    background: rgba(61, 214, 140, 0.12);
+    color: var(--green);
+}
+
+.verdict-miss {
+    border: 1px solid var(--red);
+    background: rgba(242, 118, 107, 0.12);
+    color: var(--red);
+}
