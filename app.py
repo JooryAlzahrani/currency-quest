@@ -10,12 +10,11 @@ Connects the interface to:
   - algorithms/ucs.py    (Uniform Cost Search)
   - algorithms/astar.py  (A* Search)
 
-Expected algorithm interface (agree on this with the UCS / A* owners):
-    ucs_search(graph, start, goal) -> {
-        "path": [...], "cost": int, "explored": [...], "time": seconds
-    }
-    astar_search(graph, start, goal) -> same dict
-A tuple (path, cost, explored, time) is also accepted.
+Algorithm functions used:
+    ucs(graph, start, goal)          -> {"path", "total_cost", "explored_nodes", "execution_time"}
+    astar_search(graph, start, goal) -> {"path", "cost", "explored", "time"}
+    visualize_ucs(graph, result) / make_astar_figure(graph, result) -> Plotly figure
+Both result formats are normalized for the comparison table and charts.
 Until those files are implemented, the app shows a "not ready yet" message
 for that algorithm; building and costing the player's route still works.
 """
@@ -61,13 +60,13 @@ load_css()
 # ---------------------------------------------------------------------------
 
 ALGORITHMS = {
-    "UCS": ("algorithms.ucs", ["ucs_search", "uniform_cost_search", "ucs", "search"]),
+    "UCS": ("algorithms.ucs", ["ucs", "ucs_search", "uniform_cost_search", "search"]),
     "A*": ("algorithms.astar", ["astar_search", "a_star_search", "astar", "a_star", "search"]),
 }
 
 # Each teammate's Plotly figure of explored nodes + optimal route: fn(graph, result) -> figure
 VISUALIZATIONS = {
-    "UCS": ("algorithms.ucs_visualization", ["make_ucs_figure"]),
+    "UCS": ("algorithms.ucs_visualization", ["visualize_ucs", "make_ucs_figure"]),
     "A*": ("algorithms.astar_visualization", ["make_astar_figure"]),
 }
 
@@ -103,6 +102,8 @@ def normalize_result(result, elapsed):
         "explored": explored_list,
         "explored_count": explored_count,
         "time_ms": seconds * 1000,
+        # The algorithm's own result, passed unchanged to its teammate's visualization
+        "raw": result,
     }
 
 
@@ -425,6 +426,10 @@ if results is not None:
                 st.info(f"{label} visualization is not ready yet (`{module_name.replace('.', '/')}.py`).")
             else:
                 try:
-                    st.plotly_chart(make_figure(graph, ready[label]), width="stretch", config={"displayModeBar": False})
+                    # theme=None keeps each teammate's own figure colours
+                    st.plotly_chart(
+                        make_figure(graph, ready[label]["raw"]),
+                        width="stretch", theme=None, config={"displayModeBar": False},
+                    )
                 except Exception as error:
                     st.error(f"{label} visualization raised an error: {type(error).__name__}: {error}")
