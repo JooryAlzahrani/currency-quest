@@ -4,7 +4,7 @@ import time
 from algorithms.heuristic import build_heuristic
 
 
-# تبحث عن أرخص مسار من البداية للهدف باستخدام f(n) = g(n) + h(n)
+# Finds the minimum-cost route from start to goal using f(n) = g(n) + h(n)
 def astar_search(graph, start, goal):
     t0 = time.perf_counter()
     h = build_heuristic(graph, goal)
@@ -54,16 +54,3 @@ def astar_search(graph, start, goal):
         "explored": explored,
         "time": elapsed,
     }
-
-
-# تشغّل A* عدة مرات وترجع متوسط الوقت بالملي ثانية
-def benchmark(graph, start, goal, runs=1000):
-    total = 0.0
-    for _ in range(runs):
-        t0 = time.perf_counter()
-        astar_search(graph, start, goal)
-        total += time.perf_counter() - t0
-    return total / runs * 1000
-
-
-

@@ -3,7 +3,7 @@ import math
 import plotly.graph_objects as go
 
 
-# ألوان الرسمة (نفس ألوان الواجهة في app.py)
+# Plot colors (same as the interface colors in app.py)
 GOLD = "#E9B949"
 GREEN = "#3DD68C"
 NODE = "#1E2A44"
@@ -11,7 +11,7 @@ TEXT = "#E8ECF4"
 EDGE = "rgba(138,147,166,0.35)"
 
 
-# توزّع العملات على شكل دائرة بنفس ترتيب خريطة الواجهة
+# Plot colors (same as the interface colors in app.py)
 def node_positions(currencies):
     positions = {}
     for i, code in enumerate(currencies):
@@ -20,7 +20,7 @@ def node_positions(currencies):
     return positions
 
 
-# ترسم العملات المستكشفة بترتيبها والمسار الأمثل اللي لقاه A*
+# Draws the currencies explored by A* with their exploration order, and the optimal route
 def make_astar_figure(graph, result):
     currencies = list(graph)
     pos = node_positions(currencies)

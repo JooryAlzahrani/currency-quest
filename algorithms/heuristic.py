@@ -1,10 +1,10 @@
 from collections import deque
 
-# ترجع أرخص تحويل في الشبكة كلها
+# Returns the cheapest conversion cost in the whole graph
 def min_edge_cost(graph):
     return min(w for nbrs in graph.values() for w in nbrs.values())
 
-# تحسب أقل عدد تحويلات من كل عملة إلى الهدف باستخدام BFS
+# Computes the minimum number of conversions from each currency to the goal using BFS
 def hop_distances_to(graph, goal):
     reverse = {n: [] for n in graph}
     for a, nbrs in graph.items():
@@ -21,7 +21,7 @@ def hop_distances_to(graph, goal):
                 queue.append(prev)
     return hops
 
-# تحسب التخمين h لكل عملة: أكبر قيمة بين ثلاث تقديرات ما تتجاوز الحقيقة
+# Computes h for each currency: the maximum of three estimates that never exceed the true cost
 def build_heuristic(graph, goal):
     w_min = min_edge_cost(graph)
     hops = hop_distances_to(graph, goal)
@@ -40,7 +40,7 @@ def build_heuristic(graph, goal):
             h[node] = max(hop_bound, leave, arrive)
     return h
 
-# تحسب التكلفة الحقيقية لكل عملة (للاختبار فقط، A* ما يستخدمها)
+# Computes the true minimum cost from each currency to the goal (for testing only, not used by A*)
 def true_costs_to(graph, goal):
     import heapq
     reverse = {n: {} for n in graph}
@@ -60,13 +60,13 @@ def true_costs_to(graph, goal):
                 heapq.heappush(pq, (nd, prev))
     return dist
 
-# تتأكد أن التخمين ما يتجاوز التكلفة الحقيقية لأي عملة
+# Checks that the heuristic never exceeds the true cost for any currency (admissibility)
 def is_admissible(graph, goal, h=None):
     h = h or build_heuristic(graph, goal)
     true = true_costs_to(graph, goal)
     return all(h[n] <= true.get(n, float("inf")) + 1e-9 for n in graph)
 
-# تتأكد أن التخمين ما ينقص بين عملتين أكثر من تكلفة التحويل بينهم
+# Checks that the heuristic never underestimates the true cost for any currency (consistency)
 def is_consistent(graph, goal, h=None):
     h = h or build_heuristic(graph, goal)
     return all(
