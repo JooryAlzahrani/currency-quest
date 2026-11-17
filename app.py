@@ -168,27 +168,53 @@ def node_positions():
     return positions
 
 
+def segment_distance(point, a, b):
+    """Shortest distance from a point to the line segment a-b."""
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    t = ((point[0] - a[0]) * dx + (point[1] - a[1]) * dy) / (dx * dx + dy * dy)
+    t = max(0.0, min(1.0, t))
+    return math.hypot(point[0] - (a[0] + t * dx), point[1] - (a[1] + t * dy))
+
+
+def place_edge_labels(pos, edges):
+    """
+    Choose where each cost label sits along its own line, as far as possible from the
+    other lines, the other labels and the currency circles. Putting every label at the
+    exact middle makes some of them land on other lines or on top of each other.
+    """
+    node_radius = 0.17
+    placed = {}
+    for key in edges:
+        a, b = pos[key[0]], pos[key[1]]
+        best_point, best_clearance = None, -math.inf
+        for t in (0.5, 0.42, 0.58, 0.34, 0.66, 0.27, 0.73):
+            point = (a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]))
+            clearance = min(
+                [segment_distance(point, pos[o[0]], pos[o[1]]) for o in edges if o != key]
+                + [math.dist(point, other) for other in placed.values()]
+                + [math.dist(point, pos[c]) - node_radius for c in pos]
+            )
+            if clearance > best_clearance:
+                best_point, best_clearance = point, clearance
+        placed[key] = best_point
+    return placed
+
+
 def graph_figure(player_route=None, optimal_route=None, current=None):
     pos = node_positions()
     fig = go.Figure()
 
-    drawn = set()
-    label_x, label_y, label_text = [], [], []
-    for source, edges in graph.items():
-        for target, weight in edges.items():
-            key = tuple(sorted((source, target)))
-            if key in drawn:
-                continue
-            drawn.add(key)
-            (x0, y0), (x1, y1) = pos[source], pos[target]
-            fig.add_trace(go.Scatter(
-                x=[x0, x1], y=[y0, y1], mode="lines",
-                line=dict(color="rgba(138,147,166,0.35)", width=2),
-                hoverinfo="skip", showlegend=False,
-            ))
-            label_x.append((x0 + x1) / 2)
-            label_y.append((y0 + y1) / 2)
-            label_text.append(str(weight))
+    edges = {}
+    for source, targets in graph.items():
+        for target, weight in targets.items():
+            edges.setdefault(tuple(sorted((source, target))), weight)
+
+    for (a, b) in edges:
+        fig.add_trace(go.Scatter(
+            x=[pos[a][0], pos[b][0]], y=[pos[a][1], pos[b][1]], mode="lines",
+            line=dict(color="rgba(138,147,166,0.35)", width=2),
+            hoverinfo="skip", showlegend=False,
+        ))
 
     def route_trace(route, color, name, dash):
         if not route or len(route) < 2:
@@ -204,10 +230,11 @@ def graph_figure(player_route=None, optimal_route=None, current=None):
     route_trace(optimal_route, GREEN, "Optimal route", "dash")
     route_trace(player_route, GOLD, "Your route", "solid")
 
-    fig.add_trace(go.Scatter(
-        x=label_x, y=label_y, mode="text", text=label_text,
-        textfont=dict(color=TEXT, size=13), hoverinfo="skip", showlegend=False,
-    ))
+    for key, (x, y) in place_edge_labels(pos, list(edges)).items():
+        fig.add_annotation(
+            x=x, y=y, text=str(edges[key]), showarrow=False,
+            font=dict(color=TEXT, size=13), bgcolor="#0B1222", borderpad=2,
+        )
 
     node_colors = [GOLD if c == current else "#1E2A44" for c in currencies]
     fig.add_trace(go.Scatter(
