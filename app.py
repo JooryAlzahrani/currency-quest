@@ -1,3 +1,4 @@
+
 """
 Currency Quest - Streamlit interface (Person 4).
 
@@ -10,7 +11,7 @@ Connects the interface to:
   - algorithms/astar.py  (A* Search)
 
 Expected algorithm interface (agree on this with the UCS / A* owners):
-    uniform_cost_search(graph, start, goal) -> {
+    ucs_search(graph, start, goal) -> {
         "path": [...], "cost": int, "explored": [...], "time": seconds
     }
     astar_search(graph, start, goal) -> same dict
@@ -60,9 +61,17 @@ load_css()
 # ---------------------------------------------------------------------------
 
 ALGORITHMS = {
-    "UCS": ("algorithms.ucs", ["uniform_cost_search", "ucs", "search"]),
+    "UCS": ("algorithms.ucs", ["ucs_search", "uniform_cost_search", "ucs", "search"]),
     "A*": ("algorithms.astar", ["astar_search", "a_star_search", "astar", "a_star", "search"]),
 }
+
+# Each teammate's Plotly figure of explored nodes + optimal route: fn(graph, result) -> figure
+VISUALIZATIONS = {
+    "UCS": ("algorithms.ucs_visualization", ["make_ucs_figure"]),
+    "A*": ("algorithms.astar_visualization", ["make_astar_figure"]),
+}
+
+ALGORITHM_COLORS = {"UCS": GOLD, "A*": GREEN}
 
 
 def find_algorithm(module_name, function_names):
@@ -225,7 +234,7 @@ def graph_figure(player_route=None, optimal_route=None, current=None):
 
 def comparison_figure(results):
     labels = list(results.keys())
-    colors = [GOLD, GREEN]
+    colors = [ALGORITHM_COLORS[l] for l in labels]
     fig = make_subplots(rows=1, cols=3, subplot_titles=("Path cost", "Explored nodes", "Execution time (ms)"))
     metrics = ["cost", "explored_count", "time_ms"]
     for col, metric in enumerate(metrics, start=1):
@@ -402,3 +411,20 @@ if results is not None:
     )
     st.markdown(table.to_html(index=False, classes="results-table", border=0), unsafe_allow_html=True)
     st.plotly_chart(comparison_figure(ready), width="stretch", config={"displayModeBar": False})
+
+    st.markdown('<div class="panel-title">How each algorithm searched</div>', unsafe_allow_html=True)
+    st.caption("Numbered currencies show the order each algorithm explored them; the highlighted line is the route it found.")
+    viz_columns = st.columns(len(ALGORITHMS))
+    for column, label in zip(viz_columns, ALGORITHMS):
+        with column:
+            module_name, names = VISUALIZATIONS[label]
+            make_figure = find_algorithm(module_name, names)
+            if label not in ready:
+                st.info(f"{label} is not ready yet.")
+            elif make_figure is None:
+                st.info(f"{label} visualization is not ready yet (`{module_name.replace('.', '/')}.py`).")
+            else:
+                try:
+                    st.plotly_chart(make_figure(graph, ready[label]), width="stretch", config={"displayModeBar": False})
+                except Exception as error:
+                    st.error(f"{label} visualization raised an error: {type(error).__name__}: {error}")
